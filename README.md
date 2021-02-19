@@ -1,2 +1,1 @@
-# flask-parking-draw
- Flask app for parking slot draw
+Flask app for parking slot draw
