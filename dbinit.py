@@ -1,4 +1,3 @@
-from pprint import pprint
 from app import app
 from app.models import Units, Spaces
 
@@ -37,30 +36,13 @@ def set_reserved(num):
     return True if num in reserved else False
 
 
-def get_neighbor(space):
-    return (
-        app.session.query(Spaces).filter_by(
-            reserved=False, id=space.id-1).first(), space
-    ) if space.locked else (space, app.session.query(Spaces).filter_by(reserved=False, id=space.id+1).first()
-                            ) if space.num not in range(48, 96) or space.num not in range(217, 225) else (space, app.session.query(Spaces).filter_by(reserved=False, id=space.id+1).first()
-                                                                                                          ) if space.locked else (app.session.query(Spaces).filter_by(reserved=False, id=space.id-1).first()
-                                                                                                                                  )
-
-
-def get_last_type(unit):
-    i = len(unit.spaces) - 1
-    if i == - 1:
-        return None
-    else:
-        return 'Covered' if unit.spaces[i].covered else 'Uncovered'
-
-
 def db_init():
 
     for i in range(11, 277):
         if str(i).endswith(('1', '2', '3', '4', '5', '6')):
             new_unity = Units(id=i, num=i, dual=set_dual(i))
             app.session.add(new_unity)
+
         else:
             i += 4
 
@@ -68,7 +50,7 @@ def db_init():
         new_space = Spaces(
             id=i,
             num=i,
-            floor='Underground' if i < 216 else 'Ground Floor',
+            floor='Subsolo' if i < 216 else 'Terreo',
             covered=set_uncovered(i),
             reserved=set_reserved(i),
             locked=set_locked(i),
@@ -76,4 +58,3 @@ def db_init():
         app.session.add(new_space)
 
     app.session.commit()
-    print('Crude database initialized successfully.')

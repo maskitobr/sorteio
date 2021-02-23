@@ -1,2 +1,16 @@
-# flask-parking-draw
- Flask app for parking slot draw
+## Requirimentos
+
+- Flask
+- SQLAlchemy
+- pdfplumber
+
+## Preparando env
+
+```sh
+export FLASK_APP=app
+export FLASK_ENV=Development
+export FLASK_DEBUG=True
+
+flask run
+```
+

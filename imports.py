@@ -1,9 +1,7 @@
 import re
 import pdfplumber
-from pprint import pprint
 from app import app
-from app.models import Units, Spaces
-from dbinit import db_init
+from app.models import Units, Spaces, Results
 from secrets import files_path
 
 
@@ -16,7 +14,6 @@ def get_unit_id(num):
 
 
 def import_2021():
-    db_init()
 
     file_2021 = files_path+'resultado-sorteio-2021.pdf'
     single_re = r"^(\d{2,3})\s(\d{1,3})\s(\D+?)\s(\D+$)"
@@ -39,11 +36,16 @@ def import_2021():
                     space_1.owner = get_unit_id(match_dual.group(1))
                     space_2.owner = get_unit_id(match_dual.group(1))
 
+    query = app.session.query(Units).order_by(Units.dual).all()
+    this_year = Results(year=2021,
+                        result=[i.serialize for i in query])
+    app.session.add(this_year)
+
     app.session.commit()
 
 
 def import_2020():
-    db_init()
+    # db_init()
 
     file_2020 = files_path+'resultado-sorteio-2020.pdf'
     single_re = r"^(\d{2,3})\s(\d{1,3})\s(\D+?)\s(\D+$)"
@@ -66,16 +68,19 @@ def import_2020():
                     space_1.owner = get_unit_id(match_dual.group(1))
                     space_2.owner = get_unit_id(match_dual.group(1))
 
+    query = app.session.query(Units).order_by(Units.dual).all()
+    this_year = Results(year=2020,
+                        result=[i.serialize for i in query])
+    app.session.add(this_year)
+
     app.session.commit()
 
 
 def import_2019():
-    db_init()
 
     with open(files_path+'resultado-sorteio-2019.txt', 'r') as f:
         for line in f:
             res = line.replace('\n', '').split(',')
-            print(res)
             if res[2] in '-':
                 space = get_space_id(res[1])
                 space.owner = get_unit_id(res[0])
@@ -85,11 +90,15 @@ def import_2019():
                 space_1.owner = get_unit_id(res[0])
                 space_2.owner = get_unit_id(res[0])
 
+    query = app.session.query(Units).order_by(Units.dual).all()
+    this_year = Results(year=2019,
+                        result=[i.serialize for i in query])
+    app.session.add(this_year)
+
     app.session.commit()
 
 
 def import_2018():
-    db_init()
 
     file_singles = files_path+'resultado-sorteio-2018-singles.pdf'
     file_duals = files_path+'resultado-sorteio-2018-duals.pdf'
@@ -117,5 +126,10 @@ def import_2018():
                 if match:
                     space = get_space_id(match.group(2))
                     space.owner = get_unit_id(match.group(1))
+
+    query = app.session.query(Units).order_by(Units.dual).all()
+    this_year = Results(year=2018,
+                        result=[i.serialize for i in query])
+    app.session.add(this_year)
 
     app.session.commit()
