@@ -1,4 +1,3 @@
-## Requirimentos
 
 - Flask
 - SQLAlchemy
@@ -13,4 +12,3 @@ export FLASK_DEBUG=True
 
 flask run
 ```
-

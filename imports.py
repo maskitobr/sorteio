@@ -45,7 +45,6 @@ def import_2021():
 
 
 def import_2020():
-    # db_init()
 
     file_2020 = files_path+'resultado-sorteio-2020.pdf'
     single_re = r"^(\d{2,3})\s(\d{1,3})\s(\D+?)\s(\D+$)"
