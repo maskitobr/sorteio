@@ -1,19 +1,25 @@
 import re
 import pdfplumber
 from app import app
-from app.models import Units, Spaces, Results
+from app.models import Units, Slots, Results
 from secrets import files_path
 
 
-def get_space_id(num):
-    return app.session.query(Spaces).get(num)
+def get_slot_id(num):
+    return app.session.query(Slots).filter(Slots.num == num).first()
 
 
 def get_unit_id(num):
-    return app.session.query(Units).get(num)
+    return app.session.query(Units).filter(Units.num == num).first()
+
+
+def bulk_data():
+    return app.session.query(Slots).update({Slots.owner_id: None})
 
 
 def import_2021():
+
+    bulk_data()
 
     file_2021 = files_path+'resultado-sorteio-2021.pdf'
     single_re = r"^(\d{2,3})\s(\d{1,3})\s(\D+?)\s(\D+$)"
@@ -27,14 +33,14 @@ def import_2021():
                 match_dual = re.search(dual_re, line)
 
                 if match_single:
-                    space = get_space_id(match_single.group(2))
-                    space.owner = get_unit_id(match_single.group(1))
+                    slot = get_slot_id(match_single.group(2))
+                    slot.owner = get_unit_id(match_single.group(1))
 
                 if match_dual:
-                    space_1 = get_space_id(match_dual.group(2))
-                    space_2 = get_space_id(match_dual.group(3))
-                    space_1.owner = get_unit_id(match_dual.group(1))
-                    space_2.owner = get_unit_id(match_dual.group(1))
+                    slot_1 = get_slot_id(match_dual.group(2))
+                    slot_2 = get_slot_id(match_dual.group(3))
+                    slot_1.owner = get_unit_id(match_dual.group(1))
+                    slot_2.owner = get_unit_id(match_dual.group(1))
 
     query = app.session.query(Units).order_by(Units.dual).all()
     this_year = Results(year=2021,
@@ -45,6 +51,8 @@ def import_2021():
 
 
 def import_2020():
+
+    bulk_data()
 
     file_2020 = files_path+'resultado-sorteio-2020.pdf'
     single_re = r"^(\d{2,3})\s(\d{1,3})\s(\D+?)\s(\D+$)"
@@ -58,14 +66,14 @@ def import_2020():
                 match_dual = re.search(dual_re, line)
 
                 if match_single:
-                    space = get_space_id(match_single.group(2))
-                    space.owner = get_unit_id(match_single.group(1))
+                    slot = get_slot_id(match_single.group(2))
+                    slot.owner = get_unit_id(match_single.group(1))
 
                 if match_dual:
-                    space_1 = get_space_id(match_dual.group(2))
-                    space_2 = get_space_id(match_dual.group(3))
-                    space_1.owner = get_unit_id(match_dual.group(1))
-                    space_2.owner = get_unit_id(match_dual.group(1))
+                    slot_1 = get_slot_id(match_dual.group(2))
+                    slot_2 = get_slot_id(match_dual.group(3))
+                    slot_1.owner = get_unit_id(match_dual.group(1))
+                    slot_2.owner = get_unit_id(match_dual.group(1))
 
     query = app.session.query(Units).order_by(Units.dual).all()
     this_year = Results(year=2020,
@@ -77,17 +85,19 @@ def import_2020():
 
 def import_2019():
 
+    bulk_data()
+
     with open(files_path+'resultado-sorteio-2019.txt', 'r') as f:
         for line in f:
             res = line.replace('\n', '').split(',')
             if res[2] in '-':
-                space = get_space_id(res[1])
-                space.owner = get_unit_id(res[0])
+                slot = get_slot_id(res[1])
+                slot.owner = get_unit_id(res[0])
             else:
-                space_1 = get_space_id(res[1])
-                space_2 = get_space_id(res[2])
-                space_1.owner = get_unit_id(res[0])
-                space_2.owner = get_unit_id(res[0])
+                slot_1 = get_slot_id(res[1])
+                slot_2 = get_slot_id(res[2])
+                slot_1.owner = get_unit_id(res[0])
+                slot_2.owner = get_unit_id(res[0])
 
     query = app.session.query(Units).order_by(Units.dual).all()
     this_year = Results(year=2019,
@@ -98,6 +108,8 @@ def import_2019():
 
 
 def import_2018():
+
+    bulk_data()
 
     file_singles = files_path+'resultado-sorteio-2018-singles.pdf'
     file_duals = files_path+'resultado-sorteio-2018-duals.pdf'
@@ -111,10 +123,10 @@ def import_2018():
                 match = re.search(match_duals, line)
 
                 if match:
-                    space_1 = get_space_id(match.group(2))
-                    space_2 = get_space_id(match.group(3))
-                    space_1.owner = get_unit_id(match.group(1))
-                    space_2.owner = get_unit_id(match.group(1))
+                    slot_1 = get_slot_id(match.group(2))
+                    slot_2 = get_slot_id(match.group(3))
+                    slot_1.owner = get_unit_id(match.group(1))
+                    slot_2.owner = get_unit_id(match.group(1))
 
     with pdfplumber.open(file_singles) as pdf:
         for page in pdf.pages:
@@ -123,8 +135,8 @@ def import_2018():
                 match = re.search(match_singles, line)
 
                 if match:
-                    space = get_space_id(match.group(2))
-                    space.owner = get_unit_id(match.group(1))
+                    slot = get_slot_id(match.group(2))
+                    slot.owner = get_unit_id(match.group(1))
 
     query = app.session.query(Units).order_by(Units.dual).all()
     this_year = Results(year=2018,

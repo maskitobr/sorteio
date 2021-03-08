@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block conteudo %}
+
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Unidade</a></th>
+            <th>Vaga 1</th>
+            <th>Vaga 2</th>
+            <th>Coberta / Descoberta</th>
+            <th>Piso</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for unidade in result|sort(attribute='num') %}
+        <tr>
+            <td>{{ unidade['num'] }}</td>
+            {% if unidade['slots']|length > 1 %}
+            {% for slot in unidade['slots'] %}
+            <td>{{ slot['vaga'] }}</td>
+            {% endfor %}
+            {% else %}
+            <td>{{ unidade['slots'][-1]['vaga'] }}</td>
+            <td> </td>
+            {% endif %}
+            <td>{{ unidade['slots'][-1]['tipo'] }}</td>
+            <td>{{ unidade['slots'][-1]['piso'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="container">
+    <div class="col text-center">
+        <!-- Buildar botão de salvar -->
+        <button class="btn btn-primary btn-lg" type="button"
+            onclick="window.location.href='{{ url_for( 'show_results' ) }}'">Salvar</button>
+        <button class="btn btn-primary btn-lg" type="button"
+            onclick="window.location.href='{{ url_for( 'show_results' ) }}'">Voltar</button>
+    </div>
+</div>
+
+{% endblock %}

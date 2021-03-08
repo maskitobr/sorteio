@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block conteudo %}
+
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th scope="col">Unidade</th>
+            <th scope="col">Vaga 1</th>
+            <th scope="col">Vaga 2</th>
+            <th scope="col">Coberta / Descoberta</th>
+            <th scope="col">Piso</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for unidade in draw %}
+        <tr>
+            <td>{{ unidade.num }}</td>
+            {% if unidade.slots|length > 1 %}
+            {% for slot in unidade.slots %}
+            <td>{{ slot.num }}</td>
+            {% endfor %}
+            {% else %}
+            <td>{{ unidade.slots[-1].num }}</td>
+            <td> </td>
+            {% endif %}
+            <td>{{ unidade.slots[-1].serialize['covered'] }}</td>
+            <td>{{ unidade.slots[-1].floor }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="container">
+    <div class="col text-center">
+        <!-- Buildar botão de salvar -->
+        <button class="btn btn-primary btn-lg" type="button"
+            onclick="window.location.href='{{ url_for( 'home' ) }}'">Salvar</button>
+        <button class="btn btn-primary btn-lg" type="button"
+            onclick="window.location.href='{{ url_for( 'home' ) }}'">Voltar</button>
+    </div>
+</div>
+
+{% endblock %}

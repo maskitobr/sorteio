@@ -12,20 +12,20 @@ class Units(Base):
                 unique=True, nullable=False)
     num = Column(Integer)
     dual = Column(Boolean)
-    spaces = relationship('Spaces', back_populates='owner')
+    slots = relationship('Slots', back_populates='owner')
 
     @property
-    def serialize_spaces(self):
+    def serialize_slots(self):
         """
         Return object's relations in easily serializable format.
         NB! Calls many2many's serialize property.
         """
         return [
             {
-                "vaga": space.num,
-                "tipo": ("Coberta" if space.covered else "Descoberta"),
-                "piso": space.floor
-            } for space in self.spaces
+                "vaga": slot.num,
+                "tipo": ("Coberta" if slot.covered else "Descoberta"),
+                "piso": slot.floor
+            } for slot in self.slots
         ]
 
     @property
@@ -33,12 +33,12 @@ class Units(Base):
         """Return object data in easily serializable format"""
         return {
             "num": self.num,
-            "spaces": self.serialize_spaces
+            "slots": self.serialize_slots
         }
 
 
-class Spaces(Base):
-    __tablename__ = 'spaces'
+class Slots(Base):
+    __tablename__ = 'slots'
 
     id = Column(Integer, primary_key=True, index=True,
                 unique=True, nullable=False)
@@ -46,8 +46,8 @@ class Spaces(Base):
     floor = Column(String)
     covered = Column(Boolean)
     reserved = Column(Boolean)
-    locked = Column(Boolean)
-    owner = relationship('Units', back_populates='spaces')
+    double = Column(Boolean)
+    owner = relationship('Units', back_populates='slots')
     owner_id = Column(Integer, ForeignKey('units.id'))
 
     @property
@@ -58,7 +58,7 @@ class Spaces(Base):
             "floor": self.floor,
             "covered": ("Coberta" if self.covered else "Descoberta"),
             "reserved": self.reserved,
-            "locked": self.locked,
+            "double": self.double,
             "owner": self.owner_id,
         }
 
@@ -68,5 +68,5 @@ class Results(Base):
 
     id = Column(Integer, primary_key=True, index=True,
                 unique=True, nullable=False)
-    year = Column(Integer)
+    year = Column(Integer, unique=True)
     result = Column(JSON)
