@@ -2,5 +2,5 @@ __pycache__/
 .vscode/
 env/
 files/
-raffle.py
 secrets.py
+todo.txt
