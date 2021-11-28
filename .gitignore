@@ -1,6 +1,4 @@
 __pycache__/
 .vscode/
 env/
-files/
-secrets.py
-todo.txt
+.venv/

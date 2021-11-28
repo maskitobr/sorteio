@@ -1,14 +1,11 @@
-
-- Flask
-- SQLAlchemy
-- pdfplumber
-
-## Preparando env
+## Install dependencies
 
 ```sh
-export FLASK_APP=app
-export FLASK_ENV=Development
-export FLASK_DEBUG=True
+make install
+```
 
-flask run
+## Running the app
+
+```sh
+make run
 ```

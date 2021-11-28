@@ -16,28 +16,27 @@ def get_locked_index(slot, index):
 def load_last_result():
     try:
         slots_q = app.session.query(Slots)
-        res_q = app.session.query(Results).order_by(
-            Results.id.desc()).first().result
+        res_q = app.session.query(Results).order_by(Results.id.desc()).first().result
         last = json.loads(str(res_q).replace("'", '"'))
         for unidade in last:
-            for slot in unidade['slots']:
-                slots_q.filter(Slots.num == slot['vaga']).update(
-                    {Slots.owner_id: unidade['num']})
-        return f'Last result loaded successfully.'
+            for slot in unidade["slots"]:
+                slots_q.filter(Slots.num == slot["vaga"]).update(
+                    {Slots.owner_id: unidade["num"]}
+                )
+        return "Last result loaded successfully."
     except AttributeError as _e:
-        return _e
+        raise _e
 
 
 def save_new_result():
     query = app.session.query(Units).all()
-    this_year = Results(year=date.today().year+1,
-                        result=[i.serialize for i in query])
+    this_year = Results(year=date.today().year + 1, result=[i.serialize for i in query])
     app.session.add(this_year)
     try:
         app.session.commit()
-        return f'Draw result saved sucessfully.'
+        return "Draw result saved sucessfully."
     except Exception as _e:
-        return _e
+        raise _e
 
 
 def draw():
@@ -53,10 +52,8 @@ def draw():
 
     # sorteando duplas
     for unidade in filter(lambda x: x.dual, units_q):
-        unc_slots = list(
-            filter(lambda s: s.double and not s.covered, slots_q))
-        cov_slots = list(
-            filter(lambda s: s.double and s.covered, slots_q))
+        unc_slots = list(filter(lambda s: s.double and not s.covered, slots_q))
+        cov_slots = list(filter(lambda s: s.double and s.covered, slots_q))
 
         # checando tipo de vaga
         if unidade.slots[-1].covered:
@@ -66,8 +63,7 @@ def draw():
 
         # sorteando vaga e vaga vizinha
         sorteada = choice(sorteio_from)
-        vizinha = sorteio_from[get_locked_index(
-            sorteada, sorteio_from.index(sorteada))]
+        vizinha = sorteio_from[get_locked_index(sorteada, sorteio_from.index(sorteada))]
 
         # atribuindo novos usuarios
         sorteada.owner_id = unidade.num
@@ -79,17 +75,25 @@ def draw():
 
     # sorteando restante
     for unidade in filter(lambda x: not x.dual, units_q):
-        unc_slots = list(
-            filter(lambda s: not s.double and not s.covered, slots_q))
-        cov_slots = list(
-            filter(lambda s: not s.double and s.covered, slots_q))
+        unc_slots = list(filter(lambda s: not s.double and not s.covered, slots_q))
+        cov_slots = list(filter(lambda s: not s.double and s.covered, slots_q))
 
         if unidade.slots[-1].covered:
-            sorteio_from = unc_slots if len(
-                unc_slots) > 0 else cov_slots if len(cov_slots) > 0 else slots_q
+            sorteio_from = (
+                unc_slots
+                if len(unc_slots) > 0
+                else cov_slots
+                if len(cov_slots) > 0
+                else slots_q
+            )
         else:
-            sorteio_from = cov_slots if len(
-                cov_slots) > 0 else unc_slots if len(unc_slots) > 0 else slots_q
+            sorteio_from = (
+                cov_slots
+                if len(cov_slots) > 0
+                else unc_slots
+                if len(unc_slots) > 0
+                else slots_q
+            )
 
         sorteada = choice(sorteio_from)
         sorteada.owner_id = unidade.num
